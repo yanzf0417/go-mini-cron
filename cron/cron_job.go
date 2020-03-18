@@ -40,7 +40,7 @@ func ParseCronData(content string) []*CronJob {
 
 func ParseCronJob(line string) *CronJob {
 	cj := &CronJob{}
-	regexLine := regexp.MustCompile(`^(?P<cron>(.*? .*? .*? .*? .*? .*? .*?))\s+(?P<job>(.+))$`)
+	regexLine := regexp.MustCompile(`^(?P<cron>((\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)(\s+[0-9\-\*,]+)?))\s+(?P<job>(.+))$`)
 	match := regexLine.FindStringSubmatch(line)
 	if match == nil {
 		panic(line)

@@ -9,6 +9,20 @@ import (
 	"time"
 )
 
+/**
+*    *    *    *    *    *    *
+-    -    -    -    -    -    -
+|    |    |    |    |    |    |
+|    |    |    |    |    |    |
+|    |    |    |    |    |    +--------- year(当前年份-当前年份+100年) 支持, - * /四种特殊字符
+|    |    |    |    |    +-------------- day of week(1-7) 支持,- * ? / L W七种特殊字符
+|    |    |    |    +------------------- month(1-12) 支持, - * /四种特殊字符
+|    |    |    +------------------------ day of month(1-31) 支持,- * ? / L #七种特殊字符
+|    |    +----------------------------- hour(0-59) 支持, - * /四种特殊字符
+|    +---------------------------------- minute(0-59) 支持, - * /四种特殊字符
++--------------------------------------- second(0-59) 支持, - * /四种特殊字符
+*/
+
 type CronExpression struct {
 	Year int
 	Month int
@@ -32,12 +46,11 @@ type CronExpression struct {
 }
 
 func ParseCronExpression(line string) *CronExpression {
-	regexLine := regexp.MustCompile(`^(?P<second>(.*?))\s+(?P<minute>(.*?))\s+(?P<hour>(.*?))\s+(?P<dayofmonth>(.*?))\s+(?P<month>(.*?))\s+(?P<dayofweek>(.*?))\s+(?P<year>(.*?))$`)
+	regexLine := regexp.MustCompile(`^(?P<second>(.*?))\s+(?P<minute>(.*?))\s+(?P<hour>(.*?))\s+(?P<dayofmonth>(.*?))\s+(?P<month>(.*?))\s+(?P<dayofweek>(.*?))(\s+(?P<year>([0-9\-\*,]+)))?$`)
 	match := regexLine.FindStringSubmatch(line)
 	if match == nil {
 		panic(line)
 	}
-
 	result := make(map[string]string)
 	groupNames := regexLine.SubexpNames()
 	for i, name := range groupNames {
@@ -45,7 +58,9 @@ func ParseCronExpression(line string) *CronExpression {
 			result[name] = match[i]
 		}
 	}
-
+	if result["year"] == "" {
+		result["year"] = "*"
+	}
 	if result["dayofmonth"] != "?" && result["dayofweek"] != "?" {
 		panic(line)
 	}
@@ -80,7 +95,7 @@ func ParseCronExpression(line string) *CronExpression {
 			}
 		}
 		if !flag {
-			panic(fmt.Sprintf("expression:%s, unknown:%s", line, v))
+			panic(fmt.Sprintf("[expression:%s, unknown:%s]", line, v))
 		}
 	}
 	return ce
