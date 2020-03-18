@@ -1,0 +1,7 @@
+*/1 * * * * ? * echo task0 > ./log.txt
+*/10 * * * * ? * echo task1 > ./log.txt
+*/20 * * * * ? * echo task2 > ./log.txt
+*/30 * * * * ? * echo task3 > ./log.txt
+0 */1 * * * ? * echo task4 > ./log.txt
+0 */20 * * * ? * echo task5 > ./log.txt
+0 */1 * * * ? * ping -n 10 www.baidu.com > ./ping.txt
