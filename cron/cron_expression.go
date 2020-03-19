@@ -23,6 +23,8 @@ import (
 +--------------------------------------- second(0-59) 支持, - * /四种特殊字符
 */
 
+//cron表达式验证地址：http://www.cronmaker.com/?0
+
 type CronExpression struct {
 	Year int
 	Month int

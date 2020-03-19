@@ -14,7 +14,6 @@ var schedule *cron.Schedule
 var jobChan chan *cron.CronJob
 
 func main() {
-	fmt.Println(os.Args)
 	if len(os.Args) < 2 {
 		fmt.Println("miss cron file")
 		os.Exit(-1)
@@ -30,8 +29,6 @@ func main() {
 		cronJob.MoveNext()
 		jobChan <- cronJob
 	}
-
-
 	c := make(chan os.Signal, 0)
 	signal.Notify(c, os.Interrupt, os.Kill)
 	<- c
