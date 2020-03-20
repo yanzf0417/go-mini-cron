@@ -57,7 +57,6 @@ func StartSchedule() {
 		runCronJobs := []*cron.CronJob{}
 		for schedule.Len() > 0 && (*schedule)[0].NextRunTime().Unix() == ts {
 			cj := heap.Pop(schedule).(*cron.CronJob)
-			util.Log("Start Job: %s", cj.Script)
 			go cj.Run()
 			cj.MoveNext()
 			if !cj.IsEnd {

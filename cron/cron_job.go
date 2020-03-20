@@ -1,10 +1,13 @@
 package cron
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"regexp"
+	"runtime"
 	"time"
 )
 
@@ -54,7 +57,31 @@ func ParseCronJob(line string) *CronJob {
 	}
 	cj.CronExpression = ParseCronExpression(result["cron"])
 	cj.Job = &Job{}
-	cj.Script = result["job"]
+	cj.Desc = result["job"]
+	cj.Action = MakeAction(result["job"])
 	return cj
 }
 
+func MakeAction(script string) func(c chan JobResult) {
+	return func(c chan JobResult) {
+		osterminal := ""
+		switch runtime.GOOS {
+		case "windows":
+			osterminal = "cmd"
+		default:
+			osterminal = "bash"
+		}
+		cmd := exec.Command(osterminal)
+		in := bytes.NewBuffer(nil)
+		cmd.Stdin = in
+		in.WriteString(script + "\n")
+		in.WriteString("exit\n")
+		err := cmd.Run()
+		if err != nil {
+			c <- JobResult{Code:-1000, Msg:fmt.Sprint(err)}
+		} else {
+			cmd.Wait()
+			c <- JobResult{cmd.ProcessState.ExitCode(), cmd.ProcessState.String()}
+		}
+	}
+}
