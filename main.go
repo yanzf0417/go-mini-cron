@@ -19,12 +19,12 @@ func main() {
 		os.Exit(-1)
 	}
 	schedule = &cron.Schedule{}
-	jobChan = make(chan *cron.CronJob)
 	heap.Init(schedule)
-	go StartSchedule()
-	go PushCronJob()
 	cron_file :=  os.Args[1]
 	cronJobs := cron.ParseCronFile(cron_file)
+	jobChan = make(chan *cron.CronJob, len(cronJobs))
+	go StartSchedule()
+	go PushCronJob()
 	for _, cronJob := range cronJobs {
 		cronJob.MoveNext()
 		jobChan <- cronJob
